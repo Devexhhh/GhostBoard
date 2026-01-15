@@ -2,6 +2,8 @@ import { Router } from "express";
 import { confessionSchema } from "../schemas/confession.js";
 import { voteSchema } from "../schemas/vote.js";
 import { Confession } from "../models/Confession.js";
+import { checkGhostLimits } from "../middlewares/rateLimit.js";
+
 
 const confessionRouter = Router();
 
@@ -10,6 +12,11 @@ confessionRouter.post("/", async (req, res) => {
 
     if (!parsed.success) {
         return res.status(400).json(parsed.error.z.treeifyError());
+    }
+
+    const allowed = await checkGhostLimits(parsed.data.ghostId, "confess");
+    if (!allowed) {
+        return res.status(429).json({ error: "Too many confessions. Try later." });
     }
 
     const confession = await Confession.create({
@@ -31,6 +38,11 @@ confessionRouter.post("/:id/vote", async (req, res) => {
     const confession = await Confession.findById(confessionId);
     if (!confession) return res.status(404).json({ error: "Confession not found" });
 
+    const allowed = await checkGhostLimits(ghostId, "vote");
+    if (!allowed) {
+        return res.status(429).json({ error: "Too many votes. Touch grass." });
+    }
+
     const existing = confession.vote.find(v => v.ghostId === ghostId);
     if (value === 0) {
         confession.vote = confession.vote.filter(v => v.ghostId !== ghostId);
@@ -44,6 +56,38 @@ confessionRouter.post("/:id/vote", async (req, res) => {
     }
     await confession.save();
     res.json({ status: "updated" });
+});
+
+confessionRouter.get("/feed", async (req, res) => {
+    const now = new Date();
+    const feed = await Confession.aggregate([
+        {
+            $addFields: {
+                score: { $sum: "$vote.value" },
+                ageInHours: {
+                    $divide: [
+                        { $subtract: [now, "$createdAt"] },
+                        1000 * 60 * 60
+                    ]
+                }
+            }
+        }, {
+            $addFields: {
+                rank: {
+                    $divide: [
+                        "$score",
+                        { $sqrt: { $add: ["$ageInHours", 1] } }
+                    ]
+                }
+            }
+        }, {
+            $sort: { rank: -1 }
+        }, {
+            $limit: 50
+        }
+    ]);
+
+    res.json(feed);
 });
 
 export default confessionRouter;
