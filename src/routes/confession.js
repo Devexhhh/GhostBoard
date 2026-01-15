@@ -14,7 +14,7 @@ confessionRouter.post("/", async (req, res) => {
         return res.status(400).json(parsed.error.z.treeifyError());
     }
 
-    const allowed = await checkGhostLimits(parsed.data.ghostId, "confess");
+    const allowed = await checkGhostLimits(parsed.data.ghostId, "confession");
     if (!allowed) {
         return res.status(429).json({ error: "Too many confessions. Try later." });
     }
