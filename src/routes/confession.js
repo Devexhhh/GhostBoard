@@ -62,6 +62,9 @@ confessionRouter.get("/feed", async (req, res) => {
     const now = new Date();
     const feed = await Confession.aggregate([
         {
+            $match: { isHidden: false }
+        },
+        {
             $addFields: {
                 score: { $sum: "$vote.value" },
                 ageInHours: {
@@ -88,6 +91,27 @@ confessionRouter.get("/feed", async (req, res) => {
     ]);
 
     res.json(feed);
+});
+
+confessionRouter.post("/:id/report", async (req, res) => {
+    const parsed = reportSchema.safeParse(req.body);
+    if (!parsed.success) {
+        return res.status(400).json(parsed.error.format());
+    }
+    const { ghostId } = parsed.data;
+    const confession = await Confession.findById(req.params.id);
+    if (!confession) return res.status(404).json({ error: "Confession not found" });
+
+    const alreadyReported = confession.reports.find(r => r.ghostId === ghostId);
+    if (alreadyReported) {
+        return res.status(400).json({ error: "You have already reported this confession." });
+    }
+    confession.reports.push({ ghostId });
+    if (confession.reports.length >= 5) {
+        confession.isHidden = true;
+    }
+    await confession.save();
+    res.json({ status: "reported", hidden: confession.isHidden });
 });
 
 export default confessionRouter;
