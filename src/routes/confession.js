@@ -16,7 +16,7 @@ confessionRouter.post("/", async (req, res) => {
 
     const allowed = await checkGhostLimits(parsed.data.ghostId, "confession");
     if (!allowed) {
-        return res.status(429).json({ error: "Too many confessions. Try later." });
+        return res.status(429).json({ error: "Too many confessions. Try again later." });
     }
 
     const confession = await Confession.create({
@@ -47,7 +47,7 @@ confessionRouter.post("/:id/vote", async (req, res) => {
     if (value === 0) {
         confession.vote = confession.vote.filter(v => v.ghostId !== ghostId);
         await confession.save();
-        return res.json({ status: "neutralized" });
+        return res.json({ status: "neutralized vote" });
     }
     if (existing) {
         existing.value = value;
@@ -55,7 +55,7 @@ confessionRouter.post("/:id/vote", async (req, res) => {
         confession.vote.push({ ghostId, value });
     }
     await confession.save();
-    res.json({ status: "updated" });
+    res.json({ status: "updated votes" });
 });
 
 confessionRouter.get("/feed", async (req, res) => {
@@ -111,7 +111,7 @@ confessionRouter.post("/:id/report", async (req, res) => {
         confession.isHidden = true;
     }
     await confession.save();
-    res.json({ status: "reported", hidden: confession.isHidden });
+    res.json({ status: "reported the confession", hidden: confession.isHidden });
 });
 
 export default confessionRouter;

@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
-    res.send("Ghostboard is alive");
+    res.send("Ghostboard is LIVE NOW!");
 });
 
 app.use("/confessions", confessionRouter);
