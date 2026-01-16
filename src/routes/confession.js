@@ -47,7 +47,7 @@ confessionRouter.post("/:id/vote", async (req, res) => {
     if (value === 0) {
         confession.vote = confession.vote.filter(v => v.ghostId !== ghostId);
         await confession.save();
-        return res.json({ status: "neutralized vote" });
+        return res.json({ status: "neutralized" });
     }
     if (existing) {
         existing.value = value;
@@ -111,7 +111,7 @@ confessionRouter.post("/:id/report", async (req, res) => {
         confession.isHidden = true;
     }
     await confession.save();
-    res.json({ status: "reported the confession", hidden: confession.isHidden });
+    res.json({ status: "reported", hidden: confession.isHidden });
 });
 
 export default confessionRouter;
