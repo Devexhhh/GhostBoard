@@ -59,11 +59,16 @@ confessionRouter.post("/:id/vote", async (req, res) => {
 });
 
 confessionRouter.get("/feed", async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
     const now = new Date();
+
     const feed = await Confession.aggregate([
         {
             $match: { isHidden: false }
         },
+
         {
             $addFields: {
                 score: { $sum: "$vote.value" },
@@ -74,7 +79,9 @@ confessionRouter.get("/feed", async (req, res) => {
                     ]
                 }
             }
-        }, {
+        },
+
+        {
             $addFields: {
                 rank: {
                     $divide: [
@@ -83,14 +90,29 @@ confessionRouter.get("/feed", async (req, res) => {
                     ]
                 }
             }
-        }, {
+        },
+
+        {
             $sort: { rank: -1 }
-        }, {
-            $limit: 50
+        },
+
+        {
+            $skip: skip
+        },
+
+        {
+            $limit: limit
         }
+
     ]);
 
-    res.json(feed);
+    res.json({
+        page,
+        limit,
+        count: feed.length,
+        data: feed
+    });
+
 });
 
 confessionRouter.post("/:id/report", async (req, res) => {
@@ -132,55 +154,6 @@ confessionRouter.get("/:id", async (req, res) => {
         score,
         votesCount: confession.vote.length,
         createdAt: confession.createdAt
-    });
-});
-
-confessionRouter.get("/feed", async (req, res) => {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-
-    const skip = (page - 1) * limit;
-
-    const now = new Date();
-
-    const feed = await Confession.aggregate([
-        {
-            $addFields: {
-                score: { $sum: "$vote.value" },
-                ageInHours: {
-                    $divide: [
-                        { $subtract: [now, "$createdAt"] },
-                        1000 * 60 * 60
-                    ]
-                }
-            }
-        },
-        {
-            $addFields: {
-                rank: {
-                    $divide: [
-                        "$score",
-                        { $sqrt: { $add: ["$ageInHours", 1] } }
-                    ]
-                }
-            }
-        },
-        {
-            $sort: { rank: -1 }
-        },
-        {
-            $skip: skip
-        },
-        {
-            $limit: limit
-        }
-    ]);
-
-    res.json({
-        page,
-        limit,
-        count: feed.length,
-        data: feed
     });
 });
 
