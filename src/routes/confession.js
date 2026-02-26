@@ -114,4 +114,25 @@ confessionRouter.post("/:id/report", async (req, res) => {
     res.json({ status: "reported", hidden: confession.isHidden });
 });
 
+confessionRouter.get("/:id", async (req, res) => {
+    const confession = await Confession.findById(req.params.id);
+
+    if (!confession) {
+        return res.status(404).json({ error: "Confession not found" });
+    }
+
+    const score = confession.vote.reduce((sum, v) => sum + v.value, 0);
+
+    res.json({
+        id: confession._id,
+        title: confession.title,
+        body: confession.body,
+        mood: confession.mood,
+        ghostId: confession.ghostId,
+        score,
+        votesCount: confession.vote.length,
+        createdAt: confession.createdAt
+    });
+});
+
 export default confessionRouter;
