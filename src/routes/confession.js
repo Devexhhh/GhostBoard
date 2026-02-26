@@ -66,7 +66,12 @@ confessionRouter.get("/feed", async (req, res) => {
 
     const feed = await Confession.aggregate([
         {
-            $match: { isHidden: false }
+            $match: {
+                $or: [
+                    { isHidden: false },
+                    { isHidden: { $exists: false } }
+                ]
+            }
         },
 
         {
