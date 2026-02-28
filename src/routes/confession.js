@@ -4,7 +4,6 @@ import { voteSchema } from "../schemas/vote.js";
 import { Confession } from "../models/Confession.js";
 import { checkGhostLimits } from "../middlewares/rateLimit.js";
 
-
 const confessionRouter = Router();
 
 confessionRouter.post("/", async (req, res) => {
