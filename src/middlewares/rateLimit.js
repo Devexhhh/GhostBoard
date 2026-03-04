@@ -24,7 +24,7 @@ export const checkGhostLimits = async (ghostId, type) => {
 
     if (type === 'vote') {
         activity.voteTime = activity.voteTime.filter(t => t > windowStart);
-        if (activity.voteTime.length >= 10) {
+        if (activity.voteTime.length >= 100) {
             return false;
         }
         activity.voteTime.push(now);
