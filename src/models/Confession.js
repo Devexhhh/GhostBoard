@@ -30,4 +30,8 @@ const confessionSchema = new mongoose.Schema({
     }
 });
 
+confessionSchema.index({ createdAt: -1 });
+confessionSchema.index({ ghostId: 1 });
+confessionSchema.index({ isHidden: 1 });
+
 export const Confession = mongoose.model("Confession", confessionSchema);
