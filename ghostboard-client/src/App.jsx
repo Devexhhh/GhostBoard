@@ -3,7 +3,6 @@ import { getFeed, postConfession, vote } from "./api";
 import ConfessionCard from "./components/ConfessionCard";
 
 function App() {
-
   const [feed, setFeed] = useState([]);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -39,7 +38,6 @@ function App() {
     await vote(id, ghostId, value);
     loadFeed();
   }
-
 
   useEffect(() => {
     async function fetchFeed() {
