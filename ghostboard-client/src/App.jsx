@@ -57,20 +57,23 @@ function App() {
   return (
     <div className="min-h-screen w-full relative overflow-x-hidden border-box selection:bg-accent-cyan selection:text-black">
       
-      {/* Global Animated Cyber Grid Background With Lightning */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-[-2]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(138,43,226,0.2),transparent_60%)]"></div>
-        <div className="absolute inset-0 opacity-60 flex justify-center perspective-[1000px]">
-          <div className="absolute w-[300%] h-[150%] top-[-20%] cyber-grid animate-cyber-grid" style={{ transformOrigin: 'top center' }}>
-              <div className="lightning-line"></div>
-              <div className="lightning-line"></div>
-              <div className="lightning-line"></div>
-          </div>
-        </div>
-        
-        {/* Dark gradient fade-out at the very bottom to blend out the grid cleanly */}
-        <div className="absolute bottom-0 left-0 w-full h-[30vh] bg-gradient-to-t from-[#030305] to-transparent"></div>
-      </div>
+      {/* Global Animated Cyber Grid Background */}
+<div className="fixed inset-0 overflow-hidden pointer-events-none z-[-2] bg-[#030305]">
+  {/* Top Glow */}
+  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(138,43,226,0.3),transparent_70%)]"></div>
+  
+  {/* The Stable Grid */}
+  <div className="absolute inset-0 flex justify-center">
+    <div className="absolute w-[200vw] h-[200vh] top-[-50%] stable-cyber-grid animate-grid-flow">
+      {/* Lightning Lines - Absolute positioned within the grid */}
+      <div className="lightning-line"></div>
+      <div className="lightning-line"></div>
+    </div>
+  </div>
+  
+  {/* Stronger Fade-out to hide the grid edges at the top and bottom */}
+  <div className="absolute inset-0 bg-gradient-to-b from-[#030305] via-transparent to-[#030305] opacity-90"></div>
+</div>
 
       <Header />
       
