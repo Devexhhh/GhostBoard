@@ -33,16 +33,6 @@
     0%, 100% { opacity: 1; }
     50% { opacity: 0.4; }
   }
-  @keyframes cyber-grid {
-    0% { transform: perspective(1000px) rotateX(60deg) translateY(0); }
-    100% { transform: perspective(1000px) rotateX(60deg) translateY(100px); }
-  }
-  @keyframes grid-lightning {
-    0% { transform: translateY(-100%) translateX(-50%); opacity: 0; }
-    10% { opacity: 1; }
-    90% { opacity: 1; }
-    100% { transform: translateY(200%) translateX(50%); opacity: 0; }
-  }
 }
 
 body {
@@ -118,4 +108,37 @@ h1:hover, h2:hover, h3:hover, h4:hover, h5:hover, h6:hover {
   animation-delay: 2s;
   background: linear-gradient(to bottom, transparent, var(--color-accent-purple), var(--color-accent-pink), transparent);
   box-shadow: 0 0 20px 2px var(--color-accent-pink);
+}
+
+/* 1. Create a grid that is already slanted/perspectival in its pattern */
+.stable-cyber-grid {
+  background-image: 
+    linear-gradient(to right, rgba(138, 43, 226, 0.2) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(138, 43, 226, 0.2) 1px, transparent 1px);
+  background-size: 60px 60px;
+  /* Instead of rotateX, we use a subtle skew and scale to mimic the look 
+     without the 3D 'vanishing point' engine breaking it */
+  transform: translateY(0) skewX(0deg) scale(1.5);
+  mask-image: linear-gradient(to bottom, transparent, black 40%, black 60%, transparent);
+}
+
+/* 2. Simple vertical animation that won't distort when zooming */
+@keyframes grid-flow {
+  0% { transform: translateY(0) scale(1.5); }
+  100% { transform: translateY(60px) scale(1.5); }
+}
+
+.animate-grid-flow {
+  animation: grid-flow 3s linear infinite;
+}
+
+/* 3. Ensure lightning lines stay thin even when zooming */
+.lightning-line {
+  position: absolute;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent, #00f2ff, transparent);
+  left: 50%;
+  filter: blur(1px) drop-shadow(0 0 10px #00f2ff);
+  opacity: 0.3;
 }
